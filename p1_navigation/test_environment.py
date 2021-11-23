@@ -1,12 +1,12 @@
 import numpy as np
-from banana_env import BananaEnv
+from envorinment import BananaEnv
 
 
 def create_env():
-    return BananaEnv('Banana_Linux_NoVis/Banana.x86_64', train_mode=False)
+    return BananaEnv('Banana_Linux_NoVis/Banana.x86_64')
 
 
-def test_env():
+def test_banana_env():
     env = create_env()
     state = env.reset()
     assert isinstance(state, np.ndarray)
