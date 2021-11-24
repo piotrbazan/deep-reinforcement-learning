@@ -16,15 +16,15 @@ class BaseAgent(ABC):
         pass
 
     @abstractmethod
+    def get_action(self, state):
+        pass
+
+    @abstractmethod
     def step(self, state, action, reward, next_state, done):
         pass
 
     @abstractmethod
-    def new_episode(self):
-        pass
-
-    @abstractmethod
-    def get_action(self, state):
+    def update(self):
         pass
 
     @abstractmethod
@@ -66,7 +66,7 @@ class DqnAgent(BaseAgent):
         self.train_every = train_every
         self.update_every = update_every
         self.tau = tau
-        self.episodes = 0
+        self.steps = 0
         self.train_num = 0
         self.target_model = None
         self.optimizer = None
@@ -81,15 +81,8 @@ class DqnAgent(BaseAgent):
         self.optimizer = optim.Adam(self.target_model.parameters(), lr=.002)
         self.train_strategy.initialize()
         self.evaluate_strategy.initialize()
-        self.episodes = 0
+        self.steps = 0
         self.losses = []
-
-    def new_episode(self):
-        self.episodes += 1
-        if self.train_mode:
-            self.train_strategy.update()
-        else:
-            self.evaluate_strategy.update()
 
     def get_action(self, state):
         state = self.make_tensor(state)
@@ -101,9 +94,17 @@ class DqnAgent(BaseAgent):
     def step(self, state, action, reward, next_state, done):
         if self.train_mode:
             self.memory.store(state, action, reward, next_state, done)
-            if len(self.memory) >= self.batch_size and self.episodes % self.train_every == 0:
+            if len(self.memory) >= self.batch_size and self.steps % self.train_every == 0:
                 batch = self.memory.sample(self.batch_size)
                 self.train_model(batch)
+        self.steps += 1
+
+    def update(self):
+        self.losses = []
+        if self.train_mode:
+            self.train_strategy.update()
+        else:
+            self.evaluate_strategy.update()
 
     def store(self, path):
         torch.save(self.online_model.state_dict(), path / 'checkpoint.pth')
@@ -152,7 +153,7 @@ class DqnAgent(BaseAgent):
 
     def state_dict(self):
         return {
-            'losses': self.losses,
+            'avg_loss': np.mean(self.losses),
             'memory': self.memory.state_dict(),
             'train_strategy': self.train_strategy.state_dict(),
             'evaluate_strategy': self.evaluate_strategy.state_dict()
