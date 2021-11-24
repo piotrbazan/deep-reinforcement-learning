@@ -6,7 +6,6 @@ class DqnModel(nn.Module):
 
     def __init__(self, input_dim, output_dim, hidden_dims, seed=42):
         super().__init__()
-        self.seed = torch.manual_seed(seed)
         self.layers = nn.ModuleList()
 
         dims = (input_dim,) + hidden_dims + (output_dim,)

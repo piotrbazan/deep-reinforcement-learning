@@ -5,6 +5,7 @@ import numpy as np
 import torch
 
 from agent import DqnAgent
+from model import DqnModel
 from replay_buffer import ReplayBuffer
 from strategy import EpsilonGreedyStrategy
 from torch import nn
@@ -29,6 +30,12 @@ def create_batch():
     dones = np.random.randint(0, 2, (BATCH_SIZE, 1))
     batch = states, actions, rewards, next_states, dones
     return batch
+
+
+def test_initialize():
+    model = DqnModel(10, 2, (5,))
+    agent = DqnAgent(model, None, EpsilonGreedyStrategy(1.0))
+    agent.initialize(True)
 
 
 def test_store_load(agent):
