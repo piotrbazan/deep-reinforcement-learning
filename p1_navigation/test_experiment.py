@@ -1,9 +1,14 @@
 import numpy as np
+import pytest
 
-from agent import BaseAgent
-from envorinment import BaseEnvironment
+from agent import BaseAgent, DqnAgent
+from envorinment import BaseEnvironment, BananaEnv
 from experiment import Experiment
 from tempfile import TemporaryDirectory
+
+from model import DqnModel
+from replay_buffer import ReplayBuffer
+from strategy import LinearEpsilonGreedyStrategy
 
 
 class TestEnv(BaseEnvironment):
@@ -60,3 +65,14 @@ def test_experiment():
     scores = exp2.evaluate(2, 5)
     assert len(scores) == 2
     assert np.allclose(scores, -5)
+
+
+@pytest.mark.skip(reason='Remove annotation to test agent learning')
+def test_dqn_experiment():
+    env = BananaEnv('Banana_Linux_NoVis/Banana.x86_64')
+    model = DqnModel(input_dim=env.nS, output_dim=env.nA, hidden_dims=(64, 64))
+    memory = ReplayBuffer(max_size=10_000)
+    train_strategy = LinearEpsilonGreedyStrategy(eps_start=1., eps_min=.1, decay=.001)
+    agent = DqnAgent(model, memory, train_strategy, ddqn=False, gamma=.9, batch_size=4, train_every=4, update_every=1, tau=1.)
+    exp = Experiment(env, agent)
+    exp.train(20)

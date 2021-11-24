@@ -31,6 +31,10 @@ class BaseAgent(ABC):
     def load(self, filename):
         pass
 
+    @abstractmethod
+    def mean_loss(self, num_samples=100):
+        pass
+
 
 class DqnAgent(BaseAgent):
 
@@ -64,6 +68,7 @@ class DqnAgent(BaseAgent):
         self.optimizer = None
         self.device = 'gpu' if torch.cuda.is_available() else 'cpu'
         self.online_model = self.online_model.to(self.device)
+        self.losses = []
 
     def initialize(self, train_mode):
         self.train_mode = train_mode
@@ -73,6 +78,7 @@ class DqnAgent(BaseAgent):
         self.train_strategy.initialize()
         self.evaluate_strategy.initialize()
         self.episode_num = 0
+        self.losses = []
 
     def step(self, state, action, reward, next_state, done):
         if self.train_mode:
@@ -114,6 +120,7 @@ class DqnAgent(BaseAgent):
         q_expected = self.online_model(states).gather(1, actions)
         assert q_target.shape == q_expected.shape
         loss = F.mse_loss(q_expected, q_target)
+        self.losses.append(loss.item())
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
@@ -135,3 +142,6 @@ class DqnAgent(BaseAgent):
             return torch.from_numpy(args[0]).float().to(self.device)
         else:
             return [torch.from_numpy(x).float().to(self.device) for x in args]
+
+    def mean_loss(self, num_samples=100):
+        return np.mean(self.losses[-num_samples:])

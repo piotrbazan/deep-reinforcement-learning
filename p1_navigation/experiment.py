@@ -3,12 +3,13 @@ import numpy as np
 from agent import BaseAgent
 from envorinment import BaseEnvironment
 from pathlib import Path
+from tqdm import trange
 
 
-def print_stats(episode_num, scores):
-    if episode_num % 100 == 0:
+def print_stats(episode_num, scores, train_loss):
+    if episode_num % 10 == 0:
         avg_score = np.mean(scores[-100:])
-        print(f'\rEpisode: {episode_num}, avg score: {avg_score :.3f}')
+        print(f'\rEpisode: {episode_num}, avg score: {avg_score :.3f}, train loss: {train_loss:.3f}')
 
 
 class Experiment:
@@ -24,7 +25,7 @@ class Experiment:
 
     def _run(self, num_episodes, max_t):
         scores = []
-        for e in range(num_episodes):
+        for e in trange(num_episodes):
             state = self.env.reset()
             score = 0
             for t in range(max_t):
@@ -36,7 +37,7 @@ class Experiment:
                 if done:
                     break
             scores.append(score)
-            print_stats(e, scores)
+            print_stats(e, scores, self.agent.mean_loss())
         return scores
 
     def train(self, episodes, max_t=1000):
