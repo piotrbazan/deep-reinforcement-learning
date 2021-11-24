@@ -38,3 +38,6 @@ class ReplayBuffer:
 
     def __len__(self):
         return self.size
+
+    def state_dict(self):
+        return dict(size=self.size)

@@ -27,3 +27,10 @@ def test_reply_buffer_sample():
     assert d.shape == (2, 1)
 
 
+def test_state_dict():
+    memory = ReplayBuffer(2)
+    assert memory.state_dict() == dict(size=0)
+    memory.store(1, 2, 3, 4, 5)
+    assert memory.state_dict() == dict(size=1)
+    memory.store(1, 2, 3, 4, 5)
+    assert memory.state_dict() == dict(size=2)
