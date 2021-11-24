@@ -30,7 +30,7 @@ class Experiment:
             for t in range(max_t):
                 action = self.agent.get_action(state)
                 next_state, reward, done, info = self.env.step(action)
-                self.agent.step(state, reward, next_state, done)
+                self.agent.step(state, action, reward, next_state, done)
                 score += reward
                 state = next_state
                 if done:
