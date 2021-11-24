@@ -34,7 +34,7 @@ class GreedyStrategy(BaseStrategy):
         return np.argmax(q_values)
 
     def state_dict(self, pretty=True):
-        return dict()
+        return dict(type='greedy strategy')
 
     def display(self, episodes: int):
         print('Nothing to display. Strategy is greedy.')

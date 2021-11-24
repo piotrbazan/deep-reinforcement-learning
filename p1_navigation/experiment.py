@@ -1,9 +1,9 @@
+from pathlib import Path
+
 import numpy as np
 
 from agent import BaseAgent
 from envorinment import BaseEnvironment
-from pathlib import Path
-from tqdm import trange
 
 
 class Experiment:
@@ -62,4 +62,4 @@ class Experiment:
     def print_stats(self, episode_num, scores):
         if episode_num % 5 == 0:
             avg_score = np.mean(scores[-100:])
-            print(f'\rEpisode: {episode_num}, avg score: {avg_score :.3f}, agent stats: {self.agent.get_stats()}', end='')
+            print(f'\rEpisode: {episode_num}, avg score: {avg_score :.3f}, agent stats: {self.agent.state_dict()}', end='')

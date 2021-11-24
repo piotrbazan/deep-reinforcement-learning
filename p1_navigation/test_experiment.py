@@ -67,7 +67,7 @@ def test_experiment():
     assert np.allclose(scores, -5)
 
 
-@pytest.mark.skip(reason='Remove annotation to test agent learning')
+# @pytest.mark.skip(reason='Remove annotation to test agent learning')
 def test_dqn_experiment():
     env = BananaEnv('Banana_Linux_NoVis/Banana.x86_64')
     model = DqnModel(input_dim=env.nS, output_dim=env.nA, hidden_dims=(64, 64))

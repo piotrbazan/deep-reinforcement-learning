@@ -75,3 +75,8 @@ def test_train_model_ddqn(agent):
     agent.initialize(True)
     batch = create_batch()
     agent.train_model(batch)
+
+
+def test_state_dict(agent):
+    res = agent.state_dict()
+    print(res)
