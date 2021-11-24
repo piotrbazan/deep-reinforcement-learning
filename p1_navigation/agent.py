@@ -156,5 +156,4 @@ class DqnAgent(BaseAgent):
             'avg_loss': np.mean(self.losses),
             'memory': self.memory.state_dict(),
             'train_strategy': self.train_strategy.state_dict(),
-            'evaluate_strategy': self.evaluate_strategy.state_dict()
         }
