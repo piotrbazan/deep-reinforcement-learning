@@ -20,6 +20,10 @@ class BaseAgent(ABC):
         pass
 
     @abstractmethod
+    def new_episode(self):
+        pass
+
+    @abstractmethod
     def get_action(self, state):
         pass
 
@@ -62,7 +66,7 @@ class DqnAgent(BaseAgent):
         self.train_every = train_every
         self.update_every = update_every
         self.tau = tau
-        self.step_num = 0
+        self.episodes = 0
         self.train_num = 0
         self.target_model = None
         self.optimizer = None
@@ -77,19 +81,15 @@ class DqnAgent(BaseAgent):
         self.optimizer = optim.Adam(self.target_model.parameters(), lr=.002)
         self.train_strategy.initialize()
         self.evaluate_strategy.initialize()
-        self.step_num = 0
+        self.episodes = 0
         self.losses = []
 
-    def step(self, state, action, reward, next_state, done):
+    def new_episode(self):
+        self.episodes += 1
         if self.train_mode:
-            self.memory.store(state, action, reward, next_state, done)
             self.train_strategy.update()
-            if len(self.memory) >= self.batch_size and self.step_num % self.train_every == 0:
-                batch = self.memory.sample(self.batch_size)
-                self.train_model(batch)
         else:
             self.evaluate_strategy.update()
-        self.step_num += 1
 
     def get_action(self, state):
         state = self.make_tensor(state)
@@ -97,6 +97,13 @@ class DqnAgent(BaseAgent):
             return self.train_strategy.select_action(self.online_model, state)
         else:
             return self.evaluate_strategy.select_action(self.online_model, state)
+
+    def step(self, state, action, reward, next_state, done):
+        if self.train_mode:
+            self.memory.store(state, action, reward, next_state, done)
+            if len(self.memory) >= self.batch_size and self.episodes % self.train_every == 0:
+                batch = self.memory.sample(self.batch_size)
+                self.train_model(batch)
 
     def store(self, path):
         torch.save(self.online_model.state_dict(), path / 'checkpoint.pth')

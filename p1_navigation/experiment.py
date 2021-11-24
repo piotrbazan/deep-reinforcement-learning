@@ -6,8 +6,6 @@ from pathlib import Path
 from tqdm import trange
 
 
-
-
 class Experiment:
     """
     Class to conduct experiments. Use train/evaluate.
@@ -21,7 +19,8 @@ class Experiment:
 
     def _run(self, num_episodes, max_t):
         scores = []
-        for e in trange(num_episodes):
+        for e in range(num_episodes):
+            self.agent.new_episode()
             state = self.env.reset()
             score = 0
             for t in range(max_t):
