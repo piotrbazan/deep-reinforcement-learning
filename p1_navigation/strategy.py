@@ -18,6 +18,10 @@ class BaseStrategy(ABC):
         pass
 
     @abstractmethod
+    def state_dict(self):
+        pass
+
+    @abstractmethod
     def display(self, episodes: int):
         pass
 
@@ -29,8 +33,11 @@ class GreedyStrategy(BaseStrategy):
             q_values = model(state).cpu().detach().data.numpy()
         return np.argmax(q_values)
 
+    def state_dict(self, pretty=True):
+        return dict()
+
     def display(self, episodes: int):
-        print('Nothing to dislpay. Strategy is greedy.')
+        print('Nothing to display. Strategy is greedy.')
 
 
 class EpsilonGreedyStrategy(BaseStrategy):
@@ -53,6 +60,9 @@ class EpsilonGreedyStrategy(BaseStrategy):
 
     def update(self):
         pass  # nothing to do here - epsilon is const
+
+    def state_dict(self):
+        return dict(epsilon=self.epsilon)
 
     def display(self, episodes: int, ax=None):
         self.initialize()

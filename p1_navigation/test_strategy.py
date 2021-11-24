@@ -10,7 +10,8 @@ def test_epsilon_greedy_strategy():
     action = strat.select_action(model, state)
     assert 0 <= action <= 1
 
-    strat.display(1000) # uncomment to see chart
+    strat.display(1000)  # uncomment to see chart
+    assert strat.state_dict() == dict(epsilon=.05)
 
 
 def test_linear_epsilon_greedy_strategy():
@@ -20,7 +21,8 @@ def test_linear_epsilon_greedy_strategy():
     action = strat.select_action(model, state)
     assert 0 <= action <= 1
 
-    strat.display(1000) # uncomment to see chart
+    strat.display(1000)  # uncomment to see chart
+    assert strat.state_dict() == dict(epsilon=.1)
 
 
 def test_exponential_epsilon_greedy_strategy():
@@ -30,5 +32,5 @@ def test_exponential_epsilon_greedy_strategy():
     action = strat.select_action(model, state)
     assert 0 <= action <= 1
 
-    strat.display(1000) # uncomment to see chart
-
+    strat.display(1000)  # uncomment to see chart
+    assert strat.state_dict() == dict(epsilon=.1)
