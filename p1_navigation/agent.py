@@ -32,7 +32,7 @@ class BaseAgent(ABC):
         pass
 
     @abstractmethod
-    def mean_loss(self, num_samples=100):
+    def get_stats(self):
         pass
 
 
@@ -143,5 +143,9 @@ class DqnAgent(BaseAgent):
         else:
             return [torch.from_numpy(x).float().to(self.device) for x in args]
 
-    def mean_loss(self, num_samples=100):
-        return np.mean(self.losses[-num_samples:])
+    def get_stats(self, pretty=True):
+        mean_loss = np.mean(self.losses[-100:])
+        if pretty:
+            return f'mean loss: {mean_loss:.3f}, memory size: {len(self.memory)}'
+        else:
+            return dict(mean_loss=mean_loss, memory_size=len(self.memory))

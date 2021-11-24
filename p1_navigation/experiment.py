@@ -6,10 +6,6 @@ from pathlib import Path
 from tqdm import trange
 
 
-def print_stats(episode_num, scores, train_loss):
-    if episode_num % 10 == 0:
-        avg_score = np.mean(scores[-100:])
-        print(f'\rEpisode: {episode_num}, avg score: {avg_score :.3f}, train loss: {train_loss:.3f}')
 
 
 class Experiment:
@@ -37,7 +33,7 @@ class Experiment:
                 if done:
                     break
             scores.append(score)
-            print_stats(e, scores, self.agent.mean_loss())
+            self.print_stats(e, scores)
         return scores
 
     def train(self, episodes, max_t=1000):
@@ -63,3 +59,8 @@ class Experiment:
         score_path = Path(path) / 'scores.npy'
         self.agent.load(model_path)
         self.train_scores = np.load(str(score_path))
+
+    def print_stats(self, episode_num, scores):
+        if episode_num % 5 == 0:
+            avg_score = np.mean(scores[-100:])
+            print(f'\rEpisode: {episode_num}, avg score: {avg_score :.3f}, agent stats: {self.agent.get_stats()}', end='')
