@@ -41,7 +41,7 @@ class Experiment:
                 self.print_stats()
             self.agent.episode_end()
             scores.append(score)
-            if len(scores) == self.target_episodes and min(scores) >= self.target_points:
+            if len(scores) == self.target_episodes and np.mean(scores) >= self.target_points:
                 min_v, mean_v = min(scores), np.mean(scores)
                 print(f'Agent passed grading achieving min score:{min_v}, mean score: {mean_v}')
                 break
