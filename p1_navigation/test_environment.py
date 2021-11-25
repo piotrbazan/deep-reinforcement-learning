@@ -1,5 +1,5 @@
 import numpy as np
-from envorinment import BananaEnv
+from environment import BananaEnv
 
 
 def create_env():

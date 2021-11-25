@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from agent import BaseAgent, DqnAgent
-from envorinment import BaseEnvironment, BananaEnv
+from environment import BaseEnvironment, BananaEnv
 from experiment import Experiment
 from tempfile import TemporaryDirectory
 

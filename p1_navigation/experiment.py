@@ -6,7 +6,7 @@ import pandas as pd
 import torch
 
 from agent import BaseAgent
-from envorinment import BaseEnvironment
+from environment import BaseEnvironment
 
 
 class Experiment:
