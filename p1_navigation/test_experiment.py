@@ -35,11 +35,14 @@ class TestAgent(BaseAgent):
     def initialize(self, train_mode):
         self.train_mode = train_mode
 
-    def step(self, state, reward, next_state, done):
-        pass
-
     def get_action(self, state, train_mode=True):
         return 1 if self.train_mode else 0
+
+    def step(self, state, action, reward, next_state, done):
+        pass
+
+    def update(self):
+        pass
 
     def store(self, filename):
         pass
@@ -47,24 +50,27 @@ class TestAgent(BaseAgent):
     def load(self, filename):
         pass
 
+    def state_dict(self):
+        return dict(loss=1.1)
+
 
 def test_experiment():
     env = TestEnv()
     agent = TestAgent()
     exp = Experiment(env, agent)
-    scores = exp.train(200, max_t=5)
-    assert len(scores) == 200
-    assert np.allclose(scores, 5)
+    exp.train(200, max_t=5)
+    assert len(exp.history) == 200
+    assert np.allclose(exp.history['score'], 5)
 
     with TemporaryDirectory() as dir:
         exp.store(dir)
         exp2 = Experiment(env, agent)
         exp2.load(dir)
-        assert np.allclose(exp.train_scores, exp2.train_scores)
+        assert exp.history.equals(exp2.history)
 
-    scores = exp2.evaluate(2, 5)
-    assert len(scores) == 2
-    assert np.allclose(scores, -5)
+    exp2.evaluate(2, 5)
+    assert len(exp2.history) == 2
+    assert np.allclose(exp2.history['score'], -5)
 
 
 # @pytest.mark.skip(reason='Remove annotation to test agent learning')

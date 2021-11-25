@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 from agent import BaseAgent
 from envorinment import BaseEnvironment
@@ -15,10 +16,10 @@ class Experiment:
     def __init__(self, env: BaseEnvironment, agent: BaseAgent):
         self.env = env
         self.agent = agent
-        self.train_scores = []
+        self.history = pd.DataFrame()
 
     def _run(self, num_episodes, max_t):
-        scores = []
+        history = []
         for e in range(num_episodes):
             state = self.env.reset()
             score = 0
@@ -30,36 +31,44 @@ class Experiment:
                 state = next_state
                 if done:
                     break
-            scores.append(score)
-            self.print_stats(e, scores)
+            history.append({'episode': e, 'score': score, 'agent': self.agent.state_dict()})
+            self.print_stats(history)
             self.agent.update()
-        return scores
+        self.history = self.parse_history(history)
 
     def train(self, episodes, max_t=1000):
         self.env.initialize(train_mode=True)
         self.agent.initialize(train_mode=True)
-        scores = self._run(episodes, max_t)
-        self.train_scores = np.array(scores)
-        return scores
+        self._run(episodes, max_t)
 
     def evaluate(self, episodes=1, max_t=1000):
         self.env.initialize(train_mode=False)
         self.agent.initialize(train_mode=False)
-        return self._run(episodes, max_t)
+        self._run(episodes, max_t)
 
     def store(self, path):
         model_path = Path(path) / 'model'
-        score_path = Path(path) / 'scores.npy'
+        history_path = Path(path) / 'history.parquet'
         self.agent.store(model_path)
-        np.save(str(score_path), self.train_scores)
+        self.history.to_parquet(history_path)
 
     def load(self, path):
         model_path = Path(path) / 'model'
-        score_path = Path(path) / 'scores.npy'
+        history_path = Path(path) / 'history.parquet'
         self.agent.load(model_path)
-        self.train_scores = np.load(str(score_path))
+        self.history = pd.read_parquet(history_path)
 
-    def print_stats(self, episode_num, scores):
-        if episode_num % 5 == 0:
-            avg_score = np.mean(scores[-100:])
-            print(f'\rEpisode: {episode_num}, avg_score: {avg_score :.3f}, agent: {self.agent.state_dict()}', end='')
+    def parse_history(self, history):
+        df = pd.DataFrame(history)
+        df['agent_avg_loss'] = df['agent'].transform(lambda d: d['avg_loss'])
+        df['agent_train_epsilon'] = df['agent'].transform(lambda d: d['train_strategy']['epsilon'])
+        return df
+
+    def print_stats(self, history):
+        if len(history) + 1 % 5 == 0:
+            last = history[-1]
+            episode = last["episode"]
+            score = last["score"]
+            loss = last["agent"]["avg_loss"]
+            epsilon = last["agent"]["train_strategy"]["epsilon"]
+            print(f'\rEpisode: {episode}, score: {score:.3f}, agent_avg_loss: {loss:.3f}, epsilon: {epsilon:.3f}', end='')
