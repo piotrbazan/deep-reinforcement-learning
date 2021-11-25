@@ -14,7 +14,7 @@ class Experiment:
     Results can be stored/loaded with store/load methods.
     """
 
-    def __init__(self, env: BaseEnvironment, agent: BaseAgent, target_points: float = 13., target_episodes=100, stats_every_episode: int = 5):
+    def __init__(self, env: BaseEnvironment, agent: BaseAgent, target_points: float = 13., target_episodes: int = 100, stats_every_episode: int = 5):
         self.env = env
         self.agent = agent
         self.target_points = target_points
@@ -77,7 +77,7 @@ class Experiment:
 
     def print_stats(self):
         last = self.history.iloc[-1]
-        episode = last['episode'] + 1
+        episode = last['episode']
         score = last['score']
         loss = last['agent_avg_loss']
         epsilon = last['agent_train_epsilon']
