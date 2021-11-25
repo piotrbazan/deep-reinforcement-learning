@@ -80,5 +80,5 @@ def test_dqn_experiment():
     memory = ReplayBuffer(max_size=10_000)
     train_strategy = LinearEpsilonGreedyStrategy(eps_start=1., eps_min=.1, decay=.001)
     agent = DqnAgent(model, memory, train_strategy, ddqn=False, gamma=.9, batch_size=4, train_every_steps=4, update_target_every_steps=1, tau=1.)
-    exp = Experiment(env, agent)
+    exp = Experiment(env, agent, stats_every_episode=1)
     exp.train(20)
