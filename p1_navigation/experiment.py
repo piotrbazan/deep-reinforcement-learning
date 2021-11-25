@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import torch
 
 from agent import BaseAgent
 from envorinment import BaseEnvironment
@@ -14,11 +15,16 @@ class Experiment:
     Results can be stored/loaded with store/load methods.
     """
 
-    def __init__(self, env: BaseEnvironment, agent: BaseAgent, target_points: float = 13., target_episodes: int = 100, stats_every_episode: int = 5):
+    def __init__(self, env: BaseEnvironment, agent: BaseAgent,
+                 target_points: float = 13.,
+                 target_episodes: int = 100,
+                 stats_every_episode: int = 5,
+                 seed: int = 42):
         self.env = env
         self.agent = agent
         self.target_points = target_points
         self.target_episodes = target_episodes
+        self.seed = seed
         self.history = pd.DataFrame()
         self.stats_every_episode = stats_every_episode
 
@@ -48,6 +54,8 @@ class Experiment:
         self.update_history(stats)
 
     def train(self, episodes, max_t=1000):
+        np.random.seed(self.seed)
+        torch.manual_seed(self.seed)
         self.env.initialize(train_mode=True)
         self.agent.initialize(train_mode=True)
         self._run(episodes, max_t)
