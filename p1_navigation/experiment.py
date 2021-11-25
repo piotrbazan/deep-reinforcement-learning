@@ -87,6 +87,7 @@ class Experiment:
         last = self.history.iloc[-1]
         episode = last['episode']
         score = last['score']
+        avg_score = self.history['score'][-100:].mean()
         loss = last['agent_avg_loss']
         epsilon = last['agent_train_epsilon']
-        print(f'\rEpisode: {episode}, score: {score:.3f}, agent_avg_loss: {loss:.3f}, epsilon: {epsilon:.3f}', end='')
+        print(f'\rEpisode: {episode}, score: {score:.3f}, avg_score: {avg_score:.1f}, agent_avg_loss: {loss:.3f}, epsilon: {epsilon:.3f}', end='')
