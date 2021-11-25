@@ -82,7 +82,7 @@ class DqnAgent(BaseAgent):
         self.train_mode = train_mode
         self.online_model.train(train_mode)
         self.target_model = copy.deepcopy(self.online_model)
-        self.optimizer = optim.Adam(self.target_model.parameters(), lr=self.lr)
+        self.optimizer = optim.Adam(self.online_model.parameters(), lr=self.lr)
         self.train_strategy.initialize()
         self.evaluate_strategy.initialize()
         self.steps = 0
