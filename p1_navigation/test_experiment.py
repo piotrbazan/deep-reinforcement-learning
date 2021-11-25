@@ -41,7 +41,7 @@ class TestAgent(BaseAgent):
     def step(self, state, action, reward, next_state, done):
         pass
 
-    def update(self):
+    def episode_end(self):
         pass
 
     def store(self, filename):
@@ -79,6 +79,6 @@ def test_dqn_experiment():
     model = DqnModel(input_dim=env.nS, output_dim=env.nA, hidden_dims=(64, 64))
     memory = ReplayBuffer(max_size=10_000)
     train_strategy = LinearEpsilonGreedyStrategy(eps_start=1., eps_min=.1, decay=.001)
-    agent = DqnAgent(model, memory, train_strategy, ddqn=False, gamma=.9, batch_size=4, train_every=4, update_every=1, tau=1.)
+    agent = DqnAgent(model, memory, train_strategy, ddqn=False, gamma=.9, batch_size=4, train_every_steps=4, update_target_every_steps=1, tau=1.)
     exp = Experiment(env, agent)
     exp.train(20)

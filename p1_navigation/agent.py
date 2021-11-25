@@ -24,7 +24,7 @@ class BaseAgent(ABC):
         pass
 
     @abstractmethod
-    def update(self):
+    def episode_end(self):
         pass
 
     @abstractmethod
@@ -50,9 +50,10 @@ class DqnAgent(BaseAgent):
                  ddqn: bool = False,
                  gamma: float = .9,
                  batch_size: int = 32,
+                 warm_up_batches:int = 5,
                  lr: float = 0.001,
-                 train_every: int = 100,
-                 update_every: int = 1,
+                 train_every_steps: int = 1,
+                 update_target_every_steps: int = 1,
                  tau: float = 1.
                  ):
 
@@ -64,9 +65,10 @@ class DqnAgent(BaseAgent):
         self.train_mode = False
         self.gamma = gamma
         self.batch_size = batch_size
+        self.warm_up_batches = warm_up_batches
         self.lr = lr
-        self.train_every = train_every
-        self.update_every = update_every
+        self.train_every_steps = train_every_steps
+        self.update_target_every_steps = update_target_every_steps
         self.tau = tau
         self.steps = 0
         self.train_num = 0
@@ -96,12 +98,14 @@ class DqnAgent(BaseAgent):
     def step(self, state, action, reward, next_state, done):
         if self.train_mode:
             self.memory.store(state, action, reward, next_state, done)
-            if len(self.memory) >= self.batch_size and self.steps % self.train_every == 0:
+            if len(self.memory) >= self.batch_size * self.warm_up_batches and self.steps % self.train_every_steps == 0:
                 batch = self.memory.sample(self.batch_size)
                 self.train_model(batch)
+            if self.steps % self.update_target_every_steps == 0:
+                self.update_target_model()
         self.steps += 1
 
-    def update(self):
+    def episode_end(self):
         self.losses = []
         if self.train_mode:
             self.train_strategy.update()
@@ -135,14 +139,10 @@ class DqnAgent(BaseAgent):
         loss.backward()
         self.optimizer.step()
 
-        self.train_num += 1
-        if self.train_num % self.update_every == 0:
-            self.update_target_model()
-
     def update_target_model(self):
         """
         Updates target model with weights from online model
-        if self.tau != 1 - there is ...
+        if self.tau != 1 - there is Polyak averaging
         """
         for target, online in zip(self.target_model.parameters(), self.online_model.parameters()):
             target.data.copy_((1 - self.tau) * target.data + self.tau * online.data)

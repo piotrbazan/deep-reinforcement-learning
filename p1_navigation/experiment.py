@@ -33,7 +33,7 @@ class Experiment:
                     break
             history.append({'episode': e, 'score': score, 'agent': self.agent.state_dict()})
             self.print_stats(history)
-            self.agent.update()
+            self.agent.episode_end()
         self.history = self.parse_history(history)
 
     def train(self, episodes, max_t=1000):
