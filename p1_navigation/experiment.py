@@ -1,3 +1,4 @@
+from collections import deque
 from pathlib import Path
 
 import numpy as np
@@ -13,13 +14,15 @@ class Experiment:
     Results can be stored/loaded with store/load methods.
     """
 
-    def __init__(self, env: BaseEnvironment, agent: BaseAgent):
+    def __init__(self, env: BaseEnvironment, agent: BaseAgent, target_points: float = 13., target_episodes=100):
         self.env = env
         self.agent = agent
+        self.target_points = target_points
+        self.target_episodes = target_episodes
         self.history = pd.DataFrame()
 
     def _run(self, num_episodes, max_t):
-        history = []
+        history, scores = [], deque(maxlen=self.target_episodes)
         for e in range(num_episodes):
             state = self.env.reset()
             score = 0
@@ -34,6 +37,11 @@ class Experiment:
             history.append({'episode': e, 'score': score, 'agent': self.agent.state_dict()})
             self.print_stats(history)
             self.agent.episode_end()
+            scores.append(score)
+            if len(scores) == self.target_episodes and min(scores) >= self.target_points:
+                min_v, mean_v = min(scores), np.mean(scores)
+                print(f'Agent passed grading achieving min score:{min_v}, mean score: {mean_v}')
+                break
         self.history = self.parse_history(history)
 
     def train(self, episodes, max_t=1000):
