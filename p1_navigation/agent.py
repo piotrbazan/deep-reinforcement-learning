@@ -50,6 +50,7 @@ class DqnAgent(BaseAgent):
                  ddqn: bool = False,
                  gamma: float = .9,
                  batch_size: int = 32,
+                 lr: float = 0.001,
                  train_every: int = 100,
                  update_every: int = 1,
                  tau: float = 1.
@@ -63,6 +64,7 @@ class DqnAgent(BaseAgent):
         self.train_mode = False
         self.gamma = gamma
         self.batch_size = batch_size
+        self.lr = lr
         self.train_every = train_every
         self.update_every = update_every
         self.tau = tau
@@ -78,7 +80,7 @@ class DqnAgent(BaseAgent):
         self.train_mode = train_mode
         self.online_model.train(train_mode)
         self.target_model = copy.deepcopy(self.online_model)
-        self.optimizer = optim.Adam(self.target_model.parameters(), lr=.002)
+        self.optimizer = optim.Adam(self.target_model.parameters(), lr=self.lr)
         self.train_strategy.initialize()
         self.evaluate_strategy.initialize()
         self.steps = 0
