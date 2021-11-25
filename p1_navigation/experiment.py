@@ -65,7 +65,7 @@ class Experiment:
         return df
 
     def print_stats(self, history):
-        if len(history) + 1 % 5 == 0:
+        if len(history) % 5 == 0:
             last = history[-1]
             episode = last["episode"]
             score = last["score"]
