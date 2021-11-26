@@ -2,11 +2,9 @@
 
 [image1]: https://user-images.githubusercontent.com/10624937/42135619-d90f2f28-7d12-11e8-8823-82b970a54d7e.gif "Trained Agent"
 
-# Project 1: Navigation
+### Project details
 
-### Introduction
-
-For this project, you will train an agent to navigate (and collect bananas!) in a large, square world.  
+This repository contains implementation of DQN/DDQN agent which tries to solve Banana Environment - 3d world where agent picks bananas:
 
 ![Trained Agent][image1]
 
@@ -32,7 +30,16 @@ The task is episodic, and in order to solve the environment, your agent must get
 
     (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux_NoVis.zip) to obtain the environment.
 
-2. Place the file in the DRLND GitHub repository, in the `p1_navigation/` folder, and unzip (or decompress) the file. 
+2. Place the file in the root of this repository and unzip (or decompress) the file. Alternatively choose different path but modify the environment path in report.ipynb notebook. 
+3. Install Udacity Deep Reinforcement Learning Nanodegree [package](https://github.com/udacity/deep-reinforcement-learning)
+```
+git clone https://github.com/udacity/deep-reinforcement-learning.git
+cd deep-reinforcement-learning/python
+pip install .
+```
+In case of issues with dependencies like `tensorflow` skip installing them as the project uses `pytorch`
+5. Install dependencies from `requirements.txt` file
+6. Install [pytorch](https://pytorch.org/get-started/locally/)
 
 ### Instructions
 
