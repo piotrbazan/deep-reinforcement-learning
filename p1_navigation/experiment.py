@@ -13,6 +13,7 @@ class Experiment:
     """
     Class to conduct experiments. Use train/evaluate.
     Results can be stored/loaded with store/load methods.
+    Object contains history - pandas dataframe with statistics
     """
 
     def __init__(self, env: BaseEnvironment, agent: BaseAgent,
@@ -66,8 +67,10 @@ class Experiment:
         self._run(episodes, max_t)
 
     def store(self, path):
-        model_path = Path(path) / 'model'
-        history_path = Path(path) / 'history.parquet'
+        path = Path(path)
+        model_path = path / 'model'
+        history_path = path / 'history.parquet'
+        model_path.mkdir(parents=True, exist_ok=True)
         self.agent.store(model_path)
         self.history.to_parquet(history_path)
 

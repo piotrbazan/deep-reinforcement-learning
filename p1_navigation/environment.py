@@ -29,6 +29,8 @@ class BananaEnv(BaseEnvironment):
 
     def __init__(self, file_name) -> None:
         """
+        Creates banana environment
+        :param file_name: path to unity binary
         """
         self.env = UnityEnvironment(file_name=file_name)
         self.brain_name = self.env.brain_names[0]
