@@ -119,6 +119,7 @@ class DqnAgent(BaseAgent):
 
     def load(self, path):
         self.online_model.load_state_dict(torch.load(path / 'checkpoint.pth'))
+        self.online_model = self.online_model.to(self.device)
 
     def train_model(self, batch):
         states, actions, rewards, next_states, dones = self.make_tensor(*batch)
