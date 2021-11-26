@@ -94,7 +94,7 @@ class Experiment:
     def update_history(self, history):
         df = pd.DataFrame(history)
         df['agent_avg_loss'] = df['agent'].transform(lambda d: d['avg_loss'])
-        df['agent_train_epsilon'] = df['agent'].transform(lambda d: d['train_strategy']['epsilon'])
+        df['agent_train_epsilon'] = df['agent'].transform(lambda d: d['strategy']['epsilon'])
         self.history = df
 
     def print_stats(self):
