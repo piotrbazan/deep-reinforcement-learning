@@ -75,6 +75,8 @@ class EpsilonGreedyStrategy(BaseStrategy):
             fig, ax = plt.subplots(1, 1, figsize=(6, 6))
         ax.plot(epsilons)
         ax.set_title(self.__class__.__name__)
+        plt.xlabel('Episodes')
+        plt.ylabel('Epsilon')
         plt.grid(True)
         plt.show()
 
