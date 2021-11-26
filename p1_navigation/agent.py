@@ -44,13 +44,13 @@ class DqnAgent(BaseAgent):
 
     def __init__(self,
                  model: nn.Module,
-                 memory: ReplayBuffer,
-                 train_strategy: BaseStrategy,
+                 memory: ReplayBuffer = None,  # not required for evaluation
+                 train_strategy: BaseStrategy = None,  # not required for evaluation
                  evaluate_strategy: BaseStrategy = GreedyStrategy(),
                  ddqn: bool = False,
                  gamma: float = .9,
                  batch_size: int = 32,
-                 warm_up_batches:int = 5,
+                 warm_up_batches: int = 5,
                  lr: float = 0.001,
                  train_every_steps: int = 1,
                  update_target_every_steps: int = 1,
@@ -81,12 +81,14 @@ class DqnAgent(BaseAgent):
     def initialize(self, train_mode):
         self.train_mode = train_mode
         self.online_model.train(train_mode)
-        self.target_model = copy.deepcopy(self.online_model)
-        self.optimizer = optim.Adam(self.online_model.parameters(), lr=self.lr)
-        self.train_strategy.initialize()
-        self.evaluate_strategy.initialize()
         self.steps = 0
-        self.losses = []
+        if train_mode:
+            self.target_model = copy.deepcopy(self.online_model)
+            self.optimizer = optim.Adam(self.online_model.parameters(), lr=self.lr)
+            self.train_strategy.initialize()
+            self.losses = []
+        else:
+            self.evaluate_strategy.initialize()
 
     def get_action(self, state):
         state = self.make_tensor(state)
@@ -154,8 +156,9 @@ class DqnAgent(BaseAgent):
             return [torch.from_numpy(x).float().to(self.device) for x in args]
 
     def state_dict(self):
+        strategy_stats = self.train_strategy.state_dict() if self.train_mode else self.evaluate_strategy.state_dict()
         return {
             'avg_loss': np.mean(self.losses),
             'memory': self.memory.state_dict(),
-            'train_strategy': self.train_strategy.state_dict(),
+            'strategy': strategy_stats,
         }

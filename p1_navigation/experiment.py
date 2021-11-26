@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
-
+from tqdm import trange
 from agent import BaseAgent
 from environment import BaseEnvironment
 
@@ -29,9 +29,14 @@ class Experiment:
         self.history = pd.DataFrame()
         self.stats_every_episode = stats_every_episode
 
-    def _run(self, num_episodes, max_t):
+    def train(self, episodes, max_t=1000):
+        np.random.seed(self.seed)
+        torch.manual_seed(self.seed)
+        self.env.initialize(train_mode=True)
+        self.agent.initialize(train_mode=True)
+
         stats, scores = [], deque(maxlen=self.target_episodes)
-        for e in range(num_episodes):
+        for e in range(episodes):
             state = self.env.reset()
             score = 0
             for t in range(max_t):
@@ -54,17 +59,23 @@ class Experiment:
                 break
         self.update_history(stats)
 
-    def train(self, episodes, max_t=1000):
-        np.random.seed(self.seed)
-        torch.manual_seed(self.seed)
-        self.env.initialize(train_mode=True)
-        self.agent.initialize(train_mode=True)
-        self._run(episodes, max_t)
-
     def evaluate(self, episodes=1, max_t=1000):
         self.env.initialize(train_mode=False)
         self.agent.initialize(train_mode=False)
-        self._run(episodes, max_t)
+        scores = []
+        for e in trange(episodes):
+            state = self.env.reset()
+            score = 0
+            for t in range(max_t):
+                action = self.agent.get_action(state)
+                next_state, reward, done, info = self.env.step(action)
+                self.agent.step(state, action, reward, next_state, done)
+                score += reward
+                state = next_state
+                if done:
+                    break
+            scores.append(score)
+        return pd.DataFrame(dict(scores=scores))
 
     def store(self, path):
         path = Path(path)

@@ -74,7 +74,7 @@ def test_experiment():
 
 
 # @pytest.mark.skip(reason='Remove annotation to test agent learning')
-def test_dqn_experiment():
+def test_dqn_experiment_train():
     env = BananaEnv('Banana_Linux_NoVis/Banana.x86_64')
     model = DqnModel(input_dim=env.nS, output_dim=env.nA, hidden_dims=(64, 64))
     memory = ReplayBuffer(max_size=10_000)
@@ -82,3 +82,12 @@ def test_dqn_experiment():
     agent = DqnAgent(model, memory, train_strategy, ddqn=False, gamma=.9, batch_size=4, train_every_steps=4, update_target_every_steps=1, tau=1.)
     exp = Experiment(env, agent, stats_every_episode=1)
     exp.train(20)
+
+# @pytest.mark.skip(reason='Remove annotation to test agent evaluate')
+def test_dqn_experiment_evaluate():
+    env = BananaEnv('Banana_Linux_NoVis/Banana.x86_64')
+    model = DqnModel(input_dim=env.nS, output_dim=env.nA, hidden_dims=(64, 64))
+    agent = DqnAgent(model)
+    exp = Experiment(env, agent, stats_every_episode=1)
+    res = exp.evaluate(3, max_t=10)
+    assert len(res) == 3
