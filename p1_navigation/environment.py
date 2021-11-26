@@ -44,7 +44,13 @@ class BananaEnv(BaseEnvironment):
         self.train_mode = train_mode
 
     def reset(self):
+        """
+        Seems train_mode=False causes environment to slow down by 20x!
+        :return:
+        """
         env_info = self.env.reset(train_mode=self.train_mode)[self.brain_name]
+        # Make environment run faster
+        env_info = self.env.reset(train_mode=True)[self.brain_name]
         state = env_info.vector_observations[0]
         return state
 
